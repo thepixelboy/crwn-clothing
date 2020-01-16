@@ -1,14 +1,28 @@
 import React from 'react';
 import StripeCheckout from 'react-stripe-checkout';
+import axios from 'axios';
 
 const StripeCheckoutButton = ({ price }) => {
-  const priceFroStripe = price * 100;
+  const priceForStripe = price * 100;
   const publishableKey = 'pk_test_vya1YcabIijuP5IsEwVlSObz00Z8REI6jL';
 
   const onToken = token => {
-    console.log(token);
-    alert('Paymenyt Successful');
-  }
+    axios({
+      url: 'payment',
+      method: 'post',
+      data: {
+        amount: priceForStripe,
+        token: token
+      }
+    }).then(response => {
+      alert('Payment successful');
+    }).catch(error => {
+      console.log('Payment error: ', error);
+      alert(
+        'There was an issue with your payment. Please sure you use the provided credit card.'
+      );
+    });
+  };
 
   return (
     <StripeCheckout
@@ -18,7 +32,7 @@ const StripeCheckoutButton = ({ price }) => {
       shippingAddress
       image='https://sendeyo.com/up/d/f3eb2117da'
       description={`Your total is $${price}`}
-      amount={priceFroStripe}
+      amount={priceForStripe}
       panelLabel='Pay Now'
       token={onToken}
       stripeKey={publishableKey}
